@@ -209,7 +209,7 @@
       '<h2>' + esc(T('talk.menhTitle')) + '</h2>' +
       '<p class="hint center">' + esc(T('talk.menhHint')) + '</p>' +
       '<label class="lbl" for="menhName">' + esc(T('talk.nameLbl')) + '</label>' +
-      '<div class="row"><input id="menhName" type="text" maxlength="40" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="' + esc(T('que.namePh')) + '"></div>' +
+      '<div class="row"><input id="menhName" type="text" maxlength="40" autocapitalize="words" spellcheck="false" placeholder="' + esc(T('que.namePh')) + '"></div>' +
       '<label class="lbl" for="menhYear">' + esc(T('que.yearLbl')) + '</label>' +
       '<div class="row"><input id="menhYear" type="number" inputmode="numeric" min="1920" max="' + maxY + '" placeholder="' + esc(T('que.yearPh')) + '"></div>' +
       '<p class="hint" id="menhMsg">' + esc(T('talk.needYear')) + '</p>' +
