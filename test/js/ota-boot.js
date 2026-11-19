@@ -39,7 +39,7 @@
   root.addEventListener('load', function () {
     var v = served(), label = doc.getElementById('version');
     if (v > 0 && label) label.textContent += ' · ' + v;
-    setTimeout(function () { if (healthy()) { try { O.bootOk(); } catch (e) { } } }, 6000);
+    setTimeout(function () { if (healthy()) { try { O.bootOk(v); } catch (e) { } } }, 6000);
     setInterval(function () {
       try { if (idle() && O.ready()) O.applyNow(); } catch (e) { }
     }, 30000);

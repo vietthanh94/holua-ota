@@ -29,6 +29,8 @@
   function diag(q) { try { new Image().src = '_diag?tag=talk&' + q + '&t=' + Date.now(); } catch (e) {} }
 
   /* ---------------- FT.Speech: play one recorded line ---------------- */
+  /* the OTA version this page was loaded from (https://hoalua.local/v<N>/...); the app plays clips of that version only */
+  var pageVer = +((/^\/v(\d+)\//.exec(root.location.pathname) || [0, 0])[1]);
   var A = root.HoLuaAudio || null, el = null, seq = 0, cur = null, lastEnd = 0, gen = 0, holdUntil = 0;
   /* a timer that dies with the current line: Speech.stop() cancels every pending step of a flow */
   function later(fn, ms) { var g = gen; setTimeout(function () { if (g === gen) fn(); }, ms); }
@@ -52,7 +54,7 @@
       /* sound off: bubble only; the flow goes on after a reading pause (cancelled by stop() like a clip) */
       if (v <= 0) { setTimeout(function () { finish(id); }, 1600); return true; }
       var ok = false;
-      if (A) { try { ok = A.play(path, v, id); } catch (e) { ok = false; } }
+      if (A) { try { ok = A.play(pageVer, path, v, id); } catch (e) { ok = false; } }
       else {
         try {
           el = new Audio(path); el.volume = Math.min(1, v);
