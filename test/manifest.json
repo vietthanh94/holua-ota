@@ -1,4 +1,4 @@
-{"format":2,"pack":"hoalua-app","version":6005,"minApp":6,"files":[
+{"format":2,"pack":"hoalua-app","version":6006,"minApp":6,"files":[
 {"path":"assets/brand/logo-phuoc-loc.png","size":49205,"sha256":"343f0a0710423eaf602aaddbd6faa40ed8ebac6d1e985e17449ed8313728aaeb"},
 {"path":"assets/fire-tiger/puppet/breath.png","size":139655,"sha256":"74e45ec0368b42c6d30c5cfb265884d104b5e873e8f1755365561a839b4f27ca"},
 {"path":"assets/fire-tiger/puppet/char.png","size":680817,"sha256":"ec8726b9a0bbfdc114cdd66b2fcf47b098feed75783344b22c223f517918d433"},
@@ -23,7 +23,7 @@
 {"path":"js/i18n.js","size":16233,"sha256":"e8492301e10e15eed7f589db696abb3d34b4c43a7d60988b1d5d3e71f592812c"},
 {"path":"js/lunar.js","size":5006,"sha256":"83f10f4d2c09487e2ece9e275fbf70720e0f7bf43d0e5478d4715bb5ce797528"},
 {"path":"js/mic.js","size":11460,"sha256":"9fb63a69c80c551aa3902c133506e36bb6792672864737ab19df657d50d3426a"},
-{"path":"js/ota-boot.js","size":2385,"sha256":"aa538eab7fff71dbef0a7d69dd05442c7f2ca794bee88c5f48d3c4fe44186c6d"},
+{"path":"js/ota-boot.js","size":2606,"sha256":"44abc86499f7e86e734275ceee53409c92200d26948bcb2429b7ac83d9adbb40"},
 {"path":"js/particle-engine.js","size":4785,"sha256":"041636cac4cb38f895e5fdb14ebe410e6d47c17f5307172f78f4c944138c0a9c"},
 {"path":"js/pet-engine.js","size":15563,"sha256":"b3e3ed025950371710194ac4879db8fd91534a4d6d33bb8982e67dd4d37191c7"},
 {"path":"js/puppet.js","size":37541,"sha256":"f18d94372738a45e09de26953840dc25138032700273efe5dc187e0d8948d76d"},

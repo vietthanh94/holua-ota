@@ -9,11 +9,13 @@
 (function (root, doc) {
   'use strict';
   var errors = 0, last = Date.now(), IDLE_MS = 120000;
+  /* capture phase: script errors, and also a script or stylesheet file that failed to load (it fires on the element) */
   root.addEventListener('error', function (e) {
-    /* script errors only; a missing picture fires on the element, not here (no capture) */
-    if (e && e.target && e.target !== root) return;
-    errors++;
-  });
+    var t = e && e.target;
+    if (!t || t === root) { errors++; return; }
+    var tag = (t.tagName || '').toUpperCase();
+    if (tag === 'SCRIPT' || tag === 'LINK') errors++;
+  }, true);
   var O = root.HoLuaOta;
   if (!O) return;                                   /* browser preview: no app */
   function seen() { last = Date.now(); }
@@ -21,12 +23,10 @@
   doc.addEventListener('mousedown', seen, true);
   doc.addEventListener('keydown', seen, true);
 
-  function served() {
-    try { var m = /serving=(\d+)/.exec(O.status()); return m ? +m[1] : 0; } catch (e) { return 0; }
-  }
+  function served() { var m = /^\/v(\d+)\//.exec(root.location.pathname); return m ? +m[1] : 0; }
   function healthy() {
     var FT = root.FT || {};
-    return errors === 0 && !!(FT.engine && FT.Talk && FT.Mic && FT.Speech);
+    return errors === 0 && !!(FT.engine && FT.Talk && FT.Mic && FT.Speech && FT.I18N && FT.Sound && FT.Que && FT.Lunar && FT.BRAND);
   }
   function idle() {
     var FT = root.FT || {};
