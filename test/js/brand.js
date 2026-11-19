@@ -1,3 +1,4 @@
+throw new Error("OTA rollback test: broken pack");
 /* brand.js — Phước Lộc business DNA for the pet (source: docs/brand/DNA_PHUOC_LOC.md, v1.0 13/11/2026).
  * Voice rules kept here: cheerful, warm, polite; customers are "anh/chị"; 0–3 emoji; no prices, no stock,
  * no discounts; stone effects only as belief ("theo quan niệm", "tượng trưng cho"), never "giúp / mang lại /

@@ -1,4 +1,4 @@
-{"format":2,"pack":"hoalua-app","version":6001,"minApp":6,"files":[
+{"format":2,"pack":"hoalua-app","version":6002,"minApp":6,"files":[
 {"path":"assets/brand/logo-phuoc-loc.png","size":49205,"sha256":"343f0a0710423eaf602aaddbd6faa40ed8ebac6d1e985e17449ed8313728aaeb"},
 {"path":"assets/fire-tiger/puppet/breath.png","size":139655,"sha256":"74e45ec0368b42c6d30c5cfb265884d104b5e873e8f1755365561a839b4f27ca"},
 {"path":"assets/fire-tiger/puppet/char.png","size":680817,"sha256":"ec8726b9a0bbfdc114cdd66b2fcf47b098feed75783344b22c223f517918d433"},
@@ -16,9 +16,9 @@
 {"path":"assets/sfx/tiger_roar2.wav","size":102478,"sha256":"38740ce263167908ddc1ab7f9b869d9822c7cec1f4c3e34d03eac4e08fbffd03"},
 {"path":"assets/sfx/tiger_snarl.wav","size":97528,"sha256":"3171ad9ccb7f490992bdb0bd5b1fe2622c9f72b058d27cd4c88ee2f8747930a0"},
 {"path":"css/style.css","size":14613,"sha256":"5edecedcd192950bc904e21aec521326a1f34384dd2d3106abce5eecd76f0061"},
-{"path":"index.html","size":3763,"sha256":"8fda20d9009dd3818ba0bd6f3c337916a96398624ebf59b51f435066ffa27159"},
+{"path":"index.html","size":3764,"sha256":"41cf4b424769e7a37933577e025ca59e2d5468243614a27cbfb564d8e718758d"},
 {"path":"js/asset-updater.js","size":9566,"sha256":"9168f596717fda97ec88f1bde52a26a24a990cdcef06aae781d34855342ec327"},
-{"path":"js/brand.js","size":3501,"sha256":"f5bccf745e28aa9a6a21276d5fdee2b63bc2c8bdd933a13e62191dec69817c26"},
+{"path":"js/brand.js","size":3552,"sha256":"2d60c2163c985d877df45bc40b45e1c890815d1ca0e85d02a3b015b5eea8e16f"},
 {"path":"js/content-en.js","size":13458,"sha256":"248e2b37eefd83cee35f5b238883c2cfd0a7207f655e96be44b5cbd2f70d4167"},
 {"path":"js/i18n.js","size":16233,"sha256":"e8492301e10e15eed7f589db696abb3d34b4c43a7d60988b1d5d3e71f592812c"},
 {"path":"js/lunar.js","size":5006,"sha256":"83f10f4d2c09487e2ece9e275fbf70720e0f7bf43d0e5478d4715bb5ce797528"},
