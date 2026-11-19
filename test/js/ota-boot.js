@@ -4,7 +4,6 @@
  *    are up, it tells the app "this version works" (bootOk). Without that the app rolls back to the last good version.
  *  - Idle update: when a newer verified version is waiting, the page reloads only between customers
  *    (nobody touched the screen for 2 min, the tiger is not talking, no panel is open).
- *  - Shows the served pack number next to the version label (e.g. "V1.5.0 · 6002"), so staff can see what runs.
  * Nothing here downloads or runs anything; the app does all checking. ES5 only (Chrome 62 WebView). */
 (function (root, doc) {
   'use strict';
@@ -34,11 +33,11 @@
     if (FT.Speech && FT.Speech.busy && FT.Speech.busy()) return false;
     if (FT.engine && FT.engine.modal) return false;
     if (FT.Mic && FT.Mic.active && FT.Mic.active()) return false;
+    if (FT.Menu && FT.Menu.open()) return false;
     return true;
   }
   root.addEventListener('load', function () {
-    var v = served(), label = doc.getElementById('version');
-    if (v > 0 && label) label.textContent += ' · ' + v;
+    var v = served();                                /* the ⚙ menu (menu.js) shows the pack number */
     setTimeout(function () { if (healthy()) { try { O.bootOk(v); } catch (e) { } } }, 6000);
     setInterval(function () {
       try { if (idle() && O.ready()) O.applyNow(); } catch (e) { }

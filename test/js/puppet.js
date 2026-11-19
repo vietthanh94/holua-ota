@@ -296,10 +296,10 @@ class Puppet {
     this._bound = this._loop.bind(this);
   }
 
-  _tex(name) {
+  _tex(name, ok) {
     this._texN = (this._texN || 0) + 1;
     const done = () => { this._loaded = (this._loaded || 0) + 1; if (this._loaded >= this._texN) this.ready = true; };
-    const t = new THREE.TextureLoader().load(BASE + name, done, undefined, done);
+    const t = new THREE.TextureLoader().load(BASE + name, () => { if (ok) ok(); done(); }, undefined, done);
     t.flipY = false; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter;
     return t;
   }
@@ -384,7 +384,8 @@ class Puppet {
       g.setAttribute('src', new THREE.BufferAttribute(new Float32Array([fx, fy, fx + fs, fy, fx, fy + fs, fx + fs, fy + fs]), 2));
       g.setIndex([0, 2, 1, 1, 2, 3]);
       const mat = new THREE.ShaderMaterial({
-        uniforms: { map: { value: this._tex('face_closed.png') }, map2: { value: this._tex('face_open.png') }, uOpen: { value: 0 }, uAlpha: { value: 0 }, uCut: { value: 0.79 },
+        uniforms: { map: { value: this._tex('face_closed.png', () => { this._faceOk = (this._faceOk || 0) + 1; }) },
+          map2: { value: this._tex('face_open.png', () => { this._faceOk = (this._faceOk || 0) + 1; }) }, uOpen: { value: 0 }, uAlpha: { value: 0 }, uCut: { value: 0.79 },
           uBright: { value: 1 }, uM: { value: [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)] } },
         vertexShader: LAYER_VS, fragmentShader: FACE_FS, side: THREE.DoubleSide, transparent: true, depthWrite: false, depthTest: false
       });
@@ -638,7 +639,7 @@ class Puppet {
     const F = this.front, now = performance.now();
     if (F.want && !F.talk && F.until && now > F.until) F.want = false;
     const busy = this.mood === 'FLY' || this.mood === 'FIRE' || this.mood === 'SLEEP' || tr.fly >= 0 || tr.fire >= 0;
-    const fT = F.want && !busy ? 1 : 0;
+    const fT = F.want && !busy && this._faceOk === 2 ? 1 : 0;   /* both face pictures must have loaded */
     F.v = clamp(F.v + (fT ? 1 : -1) * dt / 0.4, 0, 1);
     const fe = sstep(0, 1, F.v);
     head.sx *= 1 - 0.4 * sstep(0, 0.6, F.v);            /* side head narrows as it turns away */
