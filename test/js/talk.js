@@ -35,8 +35,14 @@
   /* a timer that dies with the current line: Speech.stop() cancels every pending step of a flow */
   function later(fn, ms) { var g = gen; setTimeout(function () { if (g === gen) fn(); }, ms); }
   function vol() { return FT.Sound && FT.Sound.voiceVolume ? FT.Sound.voiceVolume() : 0.7; }
+  /* front face (puppet.js): the tiger faces the customer and moves its mouth while a clip plays */
+  function face(talking) {
+    var r = FT.engine && FT.engine.rig;
+    if (r && r.setTalking) { try { r.setTalking(talking); } catch (e) {} }
+  }
   function finish(id) {
     if (!cur || cur.id !== id) return;
+    face(false);
     var done = cur.then; cur = null; lastEnd = Date.now();
     if (done) later(done, 250);
   }
@@ -64,12 +70,14 @@
         } catch (e) { ok = false; }
       }
       if (!ok) setTimeout(function () { finish(id); }, 1600);   /* missing clip: same as silent */
+      else face(true);
       return true;
     },
     stop: function () {
       if (FT.Mic && FT.Mic.active && FT.Mic.active()) FT.Mic.cancel();   /* never play into an open microphone */
       if (A) { try { A.stop(); } catch (e) {} }
       if (el) { try { el.pause(); } catch (e) {} el = null; }
+      if (cur) face(false);
       cur = null; gen++; holdUntil = 0;
     },
     /* busy for a short moment before a line starts (the greeting waits for the chuff) */

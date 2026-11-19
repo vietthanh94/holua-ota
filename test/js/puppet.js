@@ -4,7 +4,10 @@
  * vertices are skinned to 2D bones (body, head, jaw, ears, 3 tail bones, 4 legs), so each part moves
  * on its own and joints bend smoothly, with no holes. The fragment shader adds eye blinks (lid made of
  * the fur above the eye), pupils that follow the finger, and flickering flames (flame.png mask).
- * Limits (honest): one camera angle, it cannot turn 360°; motion is bending/rotating the art, not a
+ * Front face (V1.5, Owner approved 2026-11-19): two front-view head drawings (face_closed / face_open.png,
+ * drawn by agy from the approved art) ride on the head bone. setFront() turns the tiger to face the customer:
+ * the side head narrows and fades while the front face widens in; setTalking() flaps the mouth while it speaks.
+ * Limits (honest): two camera angles only, it cannot turn 360°; motion is bending/rotating the art, not a
  * 3D model. Same public API as rig.js / tiger3d.js. Needs WebGL2 (falls back like tiger3d). */
 import * as THREE from './vendor/three.module.min.js';
 
@@ -32,6 +35,7 @@ const EYES = [ // lid ellipse cx, cy, rx, ry | iris cx, cy, r
   [862, 203, 32, 36, 868, 205, 21]
 ];
 const MOUTH = [872, 308];            // where the fire breath leaves the mouth
+const FACE = [392, -40, 600];        // front face square: left, top, size (source px)
 /* bones: name, parent, pivot */
 const BONES = [
   ['root', -1, 560, 560], ['body', 0, 560, 640], ['head', 1, 700, 420], ['jaw', 2, 790, 292],
@@ -84,10 +88,12 @@ float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f
 const CHAR_VS = `
 attribute vec4 skinIdx; attribute vec4 skinW; attribute vec2 src;
 uniform vec3 uB[${NB * 2}];
-varying vec2 vUv; varying vec2 vSrc;
+varying vec2 vUv; varying vec2 vSrc; varying float vHead;
+float hd(float i, float w){ return (i > 1.5 && i < 5.5) ? w : 0.0; }
 vec2 sk(float i, vec2 p){ int k = int(i) * 2; vec3 r0 = uB[k], r1 = uB[k + 1]; return vec2(dot(r0, vec3(p, 1.0)), dot(r1, vec3(p, 1.0))); }
 void main(){
   vUv = uv; vSrc = src;
+  vHead = hd(skinIdx.x, skinW.x) + hd(skinIdx.y, skinW.y) + hd(skinIdx.z, skinW.z) + hd(skinIdx.w, skinW.w);
   vec2 p = sk(skinIdx.x, src) * skinW.x + sk(skinIdx.y, src) * skinW.y + sk(skinIdx.z, src) * skinW.z + sk(skinIdx.w, src) * skinW.w;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p.x, -p.y, 0.0, 1.0);
 }`;
@@ -95,7 +101,8 @@ const CHAR_FS = `
 uniform sampler2D map; uniform sampler2D fmap; uniform vec4 uBox; uniform float uTime; uniform float uFlame;
 uniform float uDistort; uniform vec2 uBlink; uniform vec2 uLook; uniform float uBright; uniform vec3 uTint;
 uniform vec2 uLidSrc; uniform vec4 uEye0; uniform vec3 uIris0; uniform vec4 uEye1; uniform vec3 uIris1;
-varying vec2 vUv; varying vec2 vSrc;
+uniform float uHide;
+varying vec2 vUv; varying vec2 vSrc; varying float vHead;
 ${NOISE}
 vec2 toUv(vec2 s){ return (s - uBox.xy) / uBox.zw; }
 vec2 eye(vec2 s, vec4 e, vec3 ir, float blink, inout float lid, inout float lash, inout float shade){
@@ -136,6 +143,7 @@ void main(){
   }
   c.rgb = mix(c.rgb, vec3(0.13, 0.06, 0.04), lash * 0.9);
   c.rgb = c.rgb * uBright + uTint * c.a;
+  c.a *= 1.0 - uHide * smoothstep(0.3, 0.75, vHead);
   if (c.a < 0.01) discard;
   gl_FragColor = c;
 }`;
@@ -156,6 +164,17 @@ void main(){
   float rv = 1.0 - smoothstep(uReveal - 0.12, uReveal, d + (n1 - 0.5) * 0.12);
   c.rgb *= 0.85 + 0.3 * n2;
   c.a *= uAlpha * rv;
+  if (c.a < 0.01) discard;
+  gl_FragColor = c;
+}`;
+const FACE_FS = `
+uniform sampler2D map; uniform sampler2D map2; uniform float uOpen; uniform float uAlpha; uniform float uBright; uniform float uCut;
+varying vec2 vUv;
+void main(){
+  vec4 a = texture2D(map, vUv), b = texture2D(map2, vUv);
+  vec4 c = mix(a, b, uOpen);
+  c.rgb *= uBright;
+  c.a *= uAlpha * (1.0 - smoothstep(uCut, uCut + 0.07, vUv.y));   /* the drawing's own collar fades out: the body keeps the original one */
   if (c.a < 0.01) discard;
   gl_FragColor = c;
 }`;
@@ -278,7 +297,8 @@ class Puppet {
   }
 
   _tex(name) {
-    const done = () => { this._loaded = (this._loaded || 0) + 1; if (this._loaded >= 4) this.ready = true; };
+    this._texN = (this._texN || 0) + 1;
+    const done = () => { this._loaded = (this._loaded || 0) + 1; if (this._loaded >= this._texN) this.ready = true; };
     const t = new THREE.TextureLoader().load(BASE + name, done, undefined, done);
     t.flipY = false; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter;
     return t;
@@ -326,7 +346,8 @@ class Puppet {
         map: { value: this._tex('char.png') }, fmap: { value: this._tex('flame.png') }, uB: { value: this.uB },
         uBox: { value: new THREE.Vector4(x0, y0, w, h) }, uTime: { value: 0 }, uFlame: { value: 1 }, uDistort: { value: 1 },
         uBlink: { value: new THREE.Vector2() }, uLook: { value: new THREE.Vector2() }, uBright: { value: 1 }, uTint: { value: new THREE.Vector3() },
-        uLidSrc: { value: new THREE.Vector2(728, 272) }, uEye0: { value: e0 }, uIris0: { value: i0 }, uEye1: { value: e1 }, uIris1: { value: i1 }
+        uLidSrc: { value: new THREE.Vector2(728, 272) }, uEye0: { value: e0 }, uIris0: { value: i0 }, uEye1: { value: e1 }, uIris1: { value: i1 },
+        uHide: { value: 0 }
       },
       vertexShader: CHAR_VS, fragmentShader: CHAR_FS, side: THREE.DoubleSide, transparent: true, depthWrite: false, depthTest: false
     });
@@ -354,6 +375,22 @@ class Puppet {
     };
     this.swirl = quad(LAYERS.swirl, 'swirl.png', 1);
     this.breath = quad(LAYERS.breath, 'breath.png', 3);
+    /* front face: one quad on the head bone, drawn over the (fading) side head */
+    {
+      const [fx, fy, fs] = FACE;
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([fx, -fy, 0, fx + fs, -fy, 0, fx, -fy - fs, 0, fx + fs, -fy - fs, 0]), 3));
+      g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), 2));
+      g.setAttribute('src', new THREE.BufferAttribute(new Float32Array([fx, fy, fx + fs, fy, fx, fy + fs, fx + fs, fy + fs]), 2));
+      g.setIndex([0, 2, 1, 1, 2, 3]);
+      const mat = new THREE.ShaderMaterial({
+        uniforms: { map: { value: this._tex('face_closed.png') }, map2: { value: this._tex('face_open.png') }, uOpen: { value: 0 }, uAlpha: { value: 0 }, uCut: { value: 0.79 },
+          uBright: { value: 1 }, uM: { value: [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)] } },
+        vertexShader: LAYER_VS, fragmentShader: FACE_FS, side: THREE.DoubleSide, transparent: true, depthWrite: false, depthTest: false
+      });
+      this.face = new THREE.Mesh(g, mat); this.face.frustumCulled = false; this.face.renderOrder = 4; this.face.visible = false;
+      this.scene.add(this.face);
+    }
 
     /* sleep Z's */
     this.zs = [];
@@ -375,6 +412,7 @@ class Puppet {
     this.charge = { on: false, level: 0 };
     this.acc = { ember: 0, breath: 0, trail: 0, charge: 0, think: 0 };
     this.touchSide = 1;
+    this.front = { v: 0, want: false, until: 0, talk: false, open: 0, flap: 0 };
     this.running = false; this._raf = 0; this._last = 0; this._fpsEMA = 60; this._low = 0;
   }
 
@@ -391,6 +429,15 @@ class Puppet {
     if (name === 'TOUCH') tr.touch = 0;
   }
   wakeUp() { this.tr.wake = 0; }
+  /* turn to face the customer (on) for at least holdMs, or turn back to the side view (off) */
+  setFront(on, holdMs) {
+    const f = this.front;
+    /* holdMs: turn back by itself after that long; none = stay until setFront(false) */
+    if (on) { f.want = true; f.until = holdMs ? Math.max(f.until, performance.now() + holdMs) : 0; }
+    else { f.want = false; f.until = 0; }
+  }
+  /* mouth flaps while the tiger speaks (front view only) */
+  setTalking(on) { this.front.talk = !!on; this.setFront(true, 3000); }      /* stays facing 3 s after the last word */
   setLook(fx, fy) {
     this.look.tx = clamp((fx - 0.5) * 2, -1, 1);
     this.look.ty = fy == null ? 0 : clamp((fy - 0.45) * 2, -1, 1);
@@ -587,6 +634,19 @@ class Puppet {
 
     this._gesture(dt, bo, head, root, body);
 
+    /* front face: turn towards the customer; never while flying, breathing fire or asleep */
+    const F = this.front, now = performance.now();
+    if (F.want && !F.talk && F.until && now > F.until) F.want = false;
+    const busy = this.mood === 'FLY' || this.mood === 'FIRE' || this.mood === 'SLEEP' || tr.fly >= 0 || tr.fire >= 0;
+    const fT = F.want && !busy ? 1 : 0;
+    F.v = clamp(F.v + (fT ? 1 : -1) * dt / 0.4, 0, 1);
+    const fe = sstep(0, 1, F.v);
+    head.sx *= 1 - 0.4 * sstep(0, 0.6, F.v);            /* side head narrows as it turns away */
+    if (F.talk && F.v > 0.5) {
+      F.flap -= dt;
+      if (F.flap <= 0) { F.open = F.open > 0.5 ? 0 : 1; F.flap = (F.open ? 0.09 : 0.07) + Math.random() * 0.12; }
+    } else F.open = 0;
+
     /* bone matrices */
     for (let i = 0; i < NB; i++) {
       const [, par, px, py] = BONES[i], b = bo[i];
@@ -598,6 +658,19 @@ class Puppet {
     const setM = (mesh, m) => { const u = mesh.material.uniforms.uM.value; u[0].set(m[0], m[2], m[4]); u[1].set(m[1], m[3], m[5]); };
     setM(this.breath, this.world[B.head]);
     setM(this.swirl, this.world[B.root]);
+    /* the face rides on the head bone but without its narrowing; it widens in as it turns */
+    {
+      const hb = bo[B.head], [, , px, py] = BONES[B.head];
+      const lh = local(px, py, hb.ox, hb.oy, hb.rot, 1, 1);
+      const wide = local(FACE[0] + FACE[2] / 2, FACE[1] + FACE[2] / 2, 0, 0, 0, 0.55 + 0.45 * fe, 1);
+      setM(this.face, mul(mul(this.world[B.body], lh), wide));
+      const fu = this.face.material.uniforms;
+      fu.uAlpha.value = sstep(0.05, 0.5, F.v);
+      fu.uOpen.value += (F.open - fu.uOpen.value) * Math.min(1, dt * 30);
+      fu.uBright.value = 1 + cl * 0.12;
+      this.face.visible = F.v > 0.01;
+      this.charMat.uniforms.uHide.value = sstep(0.35, 0.8, F.v);
+    }
 
     /* shader state */
     const fl = p.flame * (1 + cl * 0.8);
