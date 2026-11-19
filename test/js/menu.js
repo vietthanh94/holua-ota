@@ -61,8 +61,15 @@
     panel.addEventListener('mousedown', inside, false);
     panel.addEventListener('click', function (e) { e.stopPropagation(); }, false);
     /* a touch anywhere else closes it (capture, before the tiger reacts) */
-    function outside(e) { if (open && !panel.contains(e.target) && !btn.contains(e.target)) close(); }
-    doc.addEventListener('touchstart', outside, true);
+    /* a touch elsewhere only closes the menu: it does not also pet the tiger (buttons still work) */
+    function outside(e) {
+      if (!open || panel.contains(e.target) || btn.contains(e.target)) return;
+      close();
+      var t = e.target, isBtn = false;
+      while (t && t !== doc) { if (t.tagName === 'BUTTON') { isBtn = true; break; } t = t.parentNode; }
+      if (!isBtn) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); }
+    }
+    doc.addEventListener('touchstart', outside, { capture: true, passive: false });
     doc.addEventListener('mousedown', outside, true);
     doc.addEventListener('visibilitychange', function () { if (doc.hidden) close(); });
     var seg = $('menuSound');
