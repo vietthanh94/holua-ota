@@ -242,3 +242,5 @@ button.que { border-color: #e0a63a; background: #4a2a10; color: #ffe2a8; font-we
 #menuPanel .seg button:first-child { margin-left: 0; }
 #menuPanel .seg button.on { background: #a4491c; border-color: #ffb070; color: #fff; }
 #otaNow { display: block; margin-top: 8px; min-width: 0; padding: 9px 14px; font-size: 15px; background: linear-gradient(180deg, #c2410c, #7c2d12); }
+/* authorship mark (Owner 2026-11-19): tiny, bottom-right corner, never catches a touch */
+#credit { position: absolute; right: 6px; bottom: 2px; z-index: 6; font-size: 6px; line-height: 1; color: rgba(255,230,203,.45); pointer-events: none; white-space: nowrap; }
