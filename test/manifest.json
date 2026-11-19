@@ -1,4 +1,4 @@
-{"format":2,"pack":"hoalua-app","version":6002,"minApp":6,"files":[
+{"format":2,"pack":"hoalua-app","version":6003,"minApp":6,"files":[
 {"path":"assets/brand/logo-phuoc-loc.png","size":49205,"sha256":"343f0a0710423eaf602aaddbd6faa40ed8ebac6d1e985e17449ed8313728aaeb"},
 {"path":"assets/fire-tiger/puppet/breath.png","size":139655,"sha256":"74e45ec0368b42c6d30c5cfb265884d104b5e873e8f1755365561a839b4f27ca"},
 {"path":"assets/fire-tiger/puppet/char.png","size":680817,"sha256":"ec8726b9a0bbfdc114cdd66b2fcf47b098feed75783344b22c223f517918d433"},
