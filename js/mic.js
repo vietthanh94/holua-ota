@@ -99,6 +99,9 @@
   function setOn(v) {
     on = v; clearTimeout(guard); sess++;
     if (btn) btn.className = v ? 'on' : '';
+    /* the tiger turns to face the customer while it listens, and keeps facing them a moment after */
+    var r = FT.engine && FT.engine.rig;
+    if (r && r.setFront) { try { r.setFront(true, v ? 0 : 3000); } catch (e) {} }
     if (v) guard = setTimeout(function () { if (on) { try { M.cancel(); } catch (e) {} setOn(false); if (FT.Talk) FT.Talk.miss(); } }, 15000);
   }
 
