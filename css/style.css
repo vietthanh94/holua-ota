@@ -1,0 +1,225 @@
+/* Fire Tiger Pet V1 — styles. Old-WebView safe (no CSS nesting, no :has, no custom props required). */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; width: 100%; height: 100%; overflow: hidden;
+  background: #08060b; color: #fff;
+  font-family: Arial, "Segoe UI", sans-serif;
+  touch-action: none; -webkit-user-select: none; user-select: none;
+}
+#stage {
+  position: relative; width: 100vw; height: 100vh; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 65%, #311009 0%, #10090b 48%, #040408 100%);
+}
+/* creature is rendered by rig.js on this canvas; #sparks (embers) sits above it */
+#creature, #creature3d { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+#sparks { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+
+/* ---- #pet is now a transparent gesture hit-area over the creature ---- */
+#pet {   /* whole stage between header and buttons: touch anywhere on the tiger (or near it) */
+  position: absolute; left: 0; right: 0; top: 64px; bottom: 74px; width: auto; height: auto;
+  cursor: pointer; touch-action: none; z-index: 4; background: transparent;
+}
+@keyframes idle {
+  0%, 100% { transform: translate(-50%, -50%) translateY(6px) rotate(-2deg); }
+  50% { transform: translate(-50%, -50%) translateY(-12px) rotate(2deg); }
+}
+#pet.touch { animation: touch .7s ease-out 1; }
+@keyframes touch {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  40% { transform: translate(-50%, -52%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+#pet.happy { animation: happy 1.3s ease-in-out 1; }
+@keyframes happy {
+  0%, 100% { transform: translate(-50%, -50%); }
+  30% { transform: translate(-50%, -70%) rotate(-8deg); }
+  60% { transform: translate(-50%, -62%) rotate(8deg); }
+}
+#pet.fly { animation: fly 2.7s ease-in-out 1; }
+@keyframes fly {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  30% { transform: translate(-50%, -100%) rotate(-12deg) scale(.86); }
+  60% { transform: translate(-50%, -105%) rotate(12deg) scale(.92); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+#pet.fire { animation: fire .85s ease-in-out 1; }
+@keyframes fire {
+  0%, 100% { transform: translate(-50%, -50%); }
+  35% { transform: translate(-55%, -50%) scale(.92); }
+  65% { transform: translate(-50%, -50%) scale(1.09); }
+}
+#pet.sleep { animation: sleep 4s ease-in-out infinite; filter: brightness(.6); }
+@keyframes sleep {
+  0%, 100% { transform: translate(-50%, -40%) scale(.88) rotate(-7deg); }
+  50% { transform: translate(-50%, -39%) scale(.9) rotate(-7deg); }
+}
+#pet.thinking { animation: thinking 1.1s ease-in-out infinite; }
+@keyframes thinking {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 0 14px rgba(120, 180, 255, .4)); }
+  50% { transform: translate(-50%, -53%) scale(1.02); filter: drop-shadow(0 0 26px rgba(120, 180, 255, .7)); }
+}
+#pet.error { animation: errshake .5s ease-in-out 2; filter: drop-shadow(0 0 16px rgba(255, 60, 60, .6)); }
+@keyframes errshake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(-54%, -50%) rotate(-4deg); }
+  75% { transform: translate(-46%, -50%) rotate(4deg); }
+}
+#pet.charging { filter: drop-shadow(0 0 30px rgba(255, 120, 0, .85)); }
+
+/* ---- chrome ---- */
+header {
+  position: absolute; top: 12px; left: 16px; right: 16px;
+  display: flex; justify-content: space-between; align-items: center; z-index: 4;
+}
+header strong { font-size: 17px; letter-spacing: 1px; color: #ffc080; }
+header .brand { display: flex; align-items: center; }
+header .brand > * + * { margin-left: 10px; }
+#brandLogo { width: 46px; height: auto; background: #fff; border-radius: 10px; padding: 3px; box-shadow: 0 0 14px #e66c1733; }
+header .brand span { display: flex; flex-direction: column; line-height: 1.15; }
+header .brand em { font-style: normal; font-size: 12px; color: #d9b48f; letter-spacing: 1px; }
+header small { font-size: 12px; color: #b7a69c; }
+#langBtn { flex: 0 0 auto; margin-left: auto; margin-right: 10px; min-width: 0; height: 44px; border-radius: 22px; padding: 0 14px; border: 1px solid rgba(255,190,120,.35); background: rgba(30,18,12,.55); color: #ffd9a8; font-size: 15px; line-height: 1; }
+#soundBtn { flex: 0 0 44px; margin-right: 12px; width: 44px !important; min-width: 0 !important; height: 44px; border-radius: 50%; border: 1px solid rgba(255,190,120,.35); background: rgba(30,18,12,.55); color: #ffd9a8; font-size: 20px; line-height: 1; padding: 0; }
+#bubble {
+  position: absolute; top: 13%; left: 17%; transform: translateX(-50%);
+  min-width: 180px; max-width: 30vw; text-align: center;
+  background: rgba(28, 15, 15, .83); border: 1px solid #8e481e; border-radius: 24px;
+  padding: 10px 17px; font-size: 17px; z-index: 3; box-shadow: 0 0 25px #e66c1722;
+}
+nav {
+  position: absolute; bottom: 12px; left: 0; right: 0;
+  display: flex; justify-content: center; flex-wrap: wrap; z-index: 5; padding: 0 12px;
+}
+button {
+  border: 1px solid #aa5924; background: #301b19; color: #ffe6cb;
+  border-radius: 20px; padding: 12px 16px; font-size: 16px; cursor: pointer; min-width: 92px;
+}
+button:active { background: #a4491c; }
+nav button { margin: 0 4px; }
+/* V1.3: answer buttons under the speech bubble (the tiger's questions, "Hỏi Hổ Lửa") */
+#chips {
+  position: absolute; top: calc(13% + 8px); left: 17%; transform: translate(-50%, 0); width: 44vw; max-width: 560px; z-index: 6;
+  display: none; flex-wrap: wrap; justify-content: center; pointer-events: none; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+#chips.show { display: flex; }
+#chips button { pointer-events: auto; margin: 3px; min-width: 0; padding: 9px 12px; font-size: 14px; line-height: 1.15; background: rgba(60, 28, 16, .92); border-color: #ffb066; }
+
+/* flame blast */
+#flame {
+  position: absolute; left: 58%; top: 41%; height: 16px; width: 0; border-radius: 80%;
+  transform: rotate(-13deg); transform-origin: left center; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, #fff8a2, #ffc02b, #ff4b00, transparent);
+  filter: blur(4px); box-shadow: 0 0 25px 12px #ff5200; z-index: 2;
+}
+#flame.active { animation: blast 1.25s ease-out 1; }
+@keyframes blast {
+  0% { opacity: 0; width: 0; }
+  18% { opacity: 1; width: 23vw; }
+  60% { opacity: 1; width: 39vw; height: 36px; }
+  100% { opacity: 0; width: 43vw; height: 5px; }
+}
+
+/* fire-charge meter (hold-to-charge) */
+#charge {
+  position: absolute; left: 50%; bottom: 76px; transform: translateX(-50%);
+  width: 46vw; max-width: 320px; height: 12px; border-radius: 8px;
+  background: rgba(60, 30, 20, .6); border: 1px solid #a4491c; overflow: hidden;
+  opacity: 0; transition: opacity .15s; z-index: 5; pointer-events: none;
+}
+#charge.show { opacity: 1; }
+#chargeFill { height: 100%; width: 0%; background: linear-gradient(90deg, #ffd34d, #ff4b00); }
+
+#status { position: absolute; right: 14px; bottom: 100px; color: #a9988b; font-size: 11px; z-index: 5; }
+#fps {
+  display: none; position: absolute; left: 14px; bottom: 100px;
+  color: #8fd0ff; font-size: 12px; z-index: 6; font-family: monospace;
+}
+
+@media (max-width: 700px) {
+  #pet { top: 64px; bottom: 120px; }
+  #bubble { top: 11%; left: 50%; max-width: 86vw; font-size: 14px; }
+  button { font-size: 13px; padding: 10px; min-width: 75px; }
+  #status { bottom: 128px; }
+  #fps { bottom: 128px; }
+  #charge { bottom: 104px; }
+}
+
+/* #pet is only a touch area now; the WebGL renderers animate the tiger, so the old CSS state
+   animations must not move or hide the touch area */
+#pet, #pet.touch, #pet.happy, #pet.fly, #pet.fire, #pet.sleep, #pet.thinking, #pet.error, #pet.charging {
+  animation: none !important; transform: none !important; filter: none !important;
+}
+
+/* ---- Xin quẻ (daily blessing draw) ---- */
+button.que { border-color: #e0a63a; background: #4a2a10; color: #ffe2a8; font-weight: bold; }
+#quePanel, #menhPanel { display: none; position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 20; background: rgba(8, 4, 4, .72); align-items: center; justify-content: center; }
+#quePanel.show, #menhPanel.show { display: flex; }
+#menhPanel { z-index: 21; }
+#quePanel .qbox, #menhPanel .qbox { position: relative; width: 94vw; max-width: 560px; max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: linear-gradient(180deg, #2a140c, #1a0c08); border: 1px solid #c8862f; border-radius: 18px; padding: 18px 20px 16px;
+  box-shadow: 0 0 40px #ff7a1a44; touch-action: pan-y; }
+#queClose, #menhClose { position: absolute; right: 8px; top: 8px; min-width: 0; padding: 6px 12px; font-size: 18px; }
+#queBody h2, #menhBody h2 { margin: 0 0 6px; color: #ffcf7a; font-size: 22px; text-align: center; }
+#queBody .date, #menhBody .date { margin: 0 0 12px; color: #e9c9a6; font-size: 14px; text-align: center; line-height: 1.5; }
+#queBody .lbl, #menhBody .lbl { display: block; color: #d9b48f; font-size: 13px; margin-bottom: 6px; }
+#queBody .row, #menhBody .row { display: flex; flex-wrap: wrap; justify-content: center; margin: 0 -4px 10px; }
+#queBody .row > *, #menhBody .row > * { margin: 0 4px 6px; }
+#queBody input, #menhBody input { width: 160px; font-size: 20px; padding: 8px 12px; border-radius: 12px; border: 1px solid #aa5924; background: #120806; color: #fff; text-align: center; }
+#queBody .chip, #menhBody .chip { min-width: 70px; padding: 9px 12px; }
+#queBody .chip.on, #menhBody .chip.on { background: #c8641c; border-color: #ffcf7a; }
+#queBody .hint, #menhBody .hint { color: #b9a08a; font-size: 13px; margin: 4px 0 12px; text-align: center; }
+#queBody .center, #menhBody .center { text-align: center; }
+#queBody .big, #menhBody .big { display: block; margin: 6px auto 0; font-size: 19px; padding: 13px 26px; background: #b8461a; border-color: #ffcf7a; }
+#queBody .btns .big, #menhBody .btns .big { display: inline-block; margin: 0; }
+#queBody .card, #menhBody .card { background: #fff8ec; color: #3a1a0c; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; text-align: center; }
+#queBody .card .date, #menhBody .card .date { color: #7a4a2a; font-size: 12px; margin-bottom: 8px; }
+#queBody .l-no, #menhBody .l-no { font-size: 13px; letter-spacing: 2px; color: #a0521c; }
+#queBody .l-name, #menhBody .l-name { font-size: 24px; font-weight: bold; color: #b3261e; margin: 2px 0 8px; }
+#queBody .l-verse, #menhBody .l-verse { font-style: italic; font-size: 16px; color: #5a2a10; }
+#queBody .l-h, #menhBody .l-h { margin-top: 10px; font-weight: bold; color: #a0521c; font-size: 14px; }
+#queBody .l-p, #menhBody .l-p { font-size: 15px; line-height: 1.4; }
+#queBody .l-wish, #menhBody .l-wish { margin-top: 12px; font-size: 15px; color: #b3261e; }
+#queBody .l-cta, #menhBody .l-cta { margin-top: 6px; font-size: 13px; color: #7a4a2a; }
+#queBody .cbrand, #menhBody .cbrand { margin: 0 0 4px; font-size: 11px; letter-spacing: .5px; color: #9a6a3a; text-transform: uppercase; }
+#queBody .l-svc, #menhBody .l-svc { margin-top: 4px; font-size: 11px; line-height: 1.35; color: #8a6a52; }
+#queBody .again, #menhBody .again { margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; background: rgba(255,207,122,.14); border: 1px solid rgba(255,207,122,.45); color: #ffdca0; font-size: 13px; text-align: center; line-height: 1.4; }
+#queBody .l-who, #menhBody .l-who { font-size: 14px; font-weight: bold; color: #5a2a10; margin-bottom: 4px; }
+#queBody .note, #menhBody .note { margin: 10px 0 0; font-size: 11px; color: #9a7a62; }
+.tube { position: relative; width: 120px; height: 170px; margin: 18px auto 8px; animation: shake .18s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+.tube .can { position: absolute; bottom: 0; left: 15px; width: 90px; height: 110px; border-radius: 10px 10px 16px 16px;
+  background: linear-gradient(90deg, #8a1a12, #d23a22, #8a1a12); border: 2px solid #ffcf7a; color: #ffcf7a; font-size: 34px; line-height: 110px; text-align: center; }
+.tube .sticks i { position: absolute; bottom: 90px; width: 8px; height: 70px; background: #e8c48a; border-radius: 3px; }
+.tube .sticks i:nth-child(1) { left: 30px; transform: rotate(-10deg); } .tube .sticks i:nth-child(2) { left: 44px; height: 78px; }
+.tube .sticks i:nth-child(3) { left: 56px; transform: rotate(4deg); height: 84px; } .tube .sticks i:nth-child(4) { left: 68px; transform: rotate(9deg); }
+.tube .sticks i:nth-child(5) { left: 80px; transform: rotate(14deg); height: 64px; }
+@keyframes shake { from { transform: rotate(-9deg) translateY(0); } to { transform: rotate(9deg) translateY(-6px); } }
+
+/* receipt slip: hidden on screen, the only thing printed (80 mm roll, 72 mm print width) */
+#slip { display: none; }
+@media print {
+  @page { size: 80mm auto; margin: 0; }
+  html, body { width: 80mm; height: auto; overflow: visible; background: #fff !important; color: #000; }
+  body > *:not(#slip) { display: none !important; }
+  #slip { display: block; width: 72mm; margin: 0 auto; padding: 3mm 0 8mm; font-family: Arial, sans-serif; color: #000; text-align: center; font-size: 11pt; line-height: 1.35; }
+  #slip .s-head img { width: 30mm; height: auto; }
+  #slip .s-brand { font-weight: bold; font-size: 11pt; margin-top: 1mm; }
+  #slip .s-slogan { font-size: 9pt; letter-spacing: .5px; }
+  #slip .s-rule { border-top: 1px dashed #000; margin: 2.5mm 0; }
+  #slip .s-title { font-weight: bold; font-size: 12pt; letter-spacing: 1px; }
+  #slip .s-date { font-size: 9pt; }
+  #slip .s-no { font-size: 9pt; letter-spacing: 1px; }
+  #slip .s-name { font-weight: bold; font-size: 15pt; margin-bottom: 1.5mm; }
+  #slip .s-verse { font-style: italic; }
+  #slip .s-h { font-weight: bold; margin-top: 2mm; font-size: 10pt; }
+  #slip .s-p { font-size: 10pt; }
+  #slip .s-wish { margin-top: 2.5mm; font-weight: bold; font-size: 10pt; }
+  #slip .s-cta { margin-top: 1.5mm; font-size: 9pt; }
+  #slip .s-foot { font-size: 9pt; }
+  #slip .s-foot span { font-size: 8pt; }
+}
+
+/* V1.4 🎤 talk button (shown only when the tablet has a speech service) */
+#micBtn { flex: 0 0 auto; margin-left: auto; margin-right: 10px; min-width: 0; height: 44px; border-radius: 22px; padding: 0 16px; border: 1px solid rgba(255,190,120,.6); background: linear-gradient(180deg, #c2410c, #7c2d12); color: #fff3e0; font-size: 16px; font-weight: 600; line-height: 1; }
+#micBtn + #langBtn { margin-left: 0; }
+#micBtn.on { background: linear-gradient(180deg, #ef4444, #991b1b); box-shadow: 0 0 0 0 rgba(239,68,68,.7); animation: micPulse 1.1s ease-out infinite; }
+@keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.7); } 100% { box-shadow: 0 0 0 16px rgba(239,68,68,0); } }

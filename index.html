@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#08060b">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' blob: data:; media-src 'self' blob: data:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Hổ Lửa Phước Lộc</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main id="stage">
+  <canvas id="creature3d"></canvas>
+  <canvas id="creature"></canvas>
+  <canvas id="sparks"></canvas>
+  <header>
+    <div class="brand"><img id="brandLogo" src="assets/brand/logo-phuoc-loc.png" alt="Logo Phước Lộc" data-i18n-alt="aria.logo"><span><strong>HỔ LỬA PHƯỚC LỘC</strong><em>Nâng Tầm Đẳng Cấp</em></span></div>
+    <button type="button" id="micBtn" style="display:none" aria-label="Nói với Hổ Lửa" data-i18n="mic.btn" data-i18n-aria="mic.aria">🎤 Nói</button>
+    <button type="button" id="langBtn" aria-label="Switch to English">🌐 English</button>
+    <button type="button" id="soundBtn" aria-label="Tắt âm thanh">🔊</button>
+    <small id="version">V1.5.0</small>
+  </header>
+  <div id="bubble">Chào anh/chị, Hổ Lửa Phước Lộc rất vui được đón anh/chị 🐯</div>
+  <div id="chips"></div>
+  <div id="pet" role="button" aria-label="Vuốt ve Hổ Lửa" data-i18n-aria="aria.pet"></div>
+  <div id="charge"><div id="chargeFill"></div></div>
+  <div id="fps"></div>
+  <div id="status" data-i18n="status">Vuốt lên: bay · Giữ: tích lửa · Chạm: vuốt ve</div>
+  <nav>
+    <button type="button" id="queOpen" class="que" data-i18n="nav.que">🎋 Xin quẻ</button>
+    <button type="button" id="talkBtn" class="talk" data-i18n="nav.talk">💬 Hỏi Hổ Lửa</button>
+    <button type="button" data-act="happy" data-i18n="nav.happy">❤️ Vuốt ve</button>
+    <button type="button" data-act="fly" data-i18n="nav.fly">🪽 Bay</button>
+    <button type="button" data-act="fire" data-i18n="nav.fire">🔥 Phun lửa</button>
+    <button type="button" data-act="sleep" data-i18n="nav.sleep">🌙 Ngủ</button>
+    <button type="button" id="otaBtn">↻ OTA</button>
+  </nav>
+  <div id="menhPanel"><div class="qbox"><button type="button" id="menhClose" aria-label="Đóng" data-i18n-aria="aria.close">✕</button><div id="menhBody"></div></div></div>
+  <div id="quePanel"><div class="qbox"><button type="button" id="queClose" aria-label="Đóng" data-i18n-aria="aria.close">✕</button><div id="queBody"></div></div></div>
+</main>
+<div id="slip"></div>
+<!-- load order matters: OTA boot check first (it counts script errors), utilities, engine last -->
+<script src="js/ota-boot.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/brand.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/lunar.js"></script>
+<script src="js/que-data.js"></script>
+<script src="js/content-en.js"></script>
+<script src="js/speech-lines.js"></script>
+<script src="js/sha256.js"></script>
+<script src="js/state-machine.js"></script>
+<script src="js/particle-engine.js"></script>
+<script src="js/rig.js"></script>
+<!-- real 3D tiger (WebGL2 + ES module). Old browsers skip it and the 2.5D rig is used. -->
+<script type="module" src="js/tiger3d.js"></script>
+<script type="module" src="js/puppet.js"></script>
+<script src="js/touch-controller.js"></script>
+<script src="js/asset-updater.js"></script>
+<script src="js/pet-engine.js"></script>
+<script src="js/que.js"></script>
+<script src="js/talk.js"></script>
+<script src="js/mic.js"></script>
+</body>
+</html>
