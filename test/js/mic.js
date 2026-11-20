@@ -34,7 +34,7 @@
 
   /* topics, checked in this order (unaccented phrases; whole words) */
   var TOPICS = [
-    { id: 'menh', w: ['menh', 'ngu hanh', 'nam sinh', 'sinh nam', 'tuoi gi', 'hop mau', 'mau hop', 'element', 'elements', 'birth year', 'born', 'zodiac'] },
+    { id: 'menh', w: ['menh', 'mang gi', 'mang nao', 'ngu hanh', 'nam sinh', 'sinh nam', 'tuoi gi', 'tuoi con gi', 'con gi', 'cung gi', 'hop mau', 'mau hop', 'element', 'elements', 'birth year', 'born', 'zodiac'] },
     { id: 'que', w: ['que', 'xin que', 'gieo que', 'boc que', 'fortune', 'blessing', 'daily blessing'] },
     { id: 'aboutCheck', w: ['kiem dinh', 'that gia', 'that hay gia', 'da that', 'hang that', 'hang gia', 'da gia', 'real stone', 'is it real', 'is this real', 'fake', 'genuine', 'certificate', 'authentic', 'tested'] },
     { id: 'aboutChoose', w: ['chon da', 'chon', 'hop voi', 'nen mua', 'nen deo', 'choose', 'pick', 'which stone', 'suits me'] },
@@ -69,9 +69,31 @@
     for (i = 2; i < TOPICS.length; i++) if (has(t, TOPICS[i].w)) return TOPICS[i].id;
     return '';
   }
+  /* V1.5.5: a birth year in what was heard.
+   *  - 4 digits ("1994", also "19 94" / "1.994" from the speech service), unless it is part of a longer number
+   *    (a price "1.994.000", a phone "0912 1994 567") or followed by a price / quantity word ("1994 viên").
+   *  - 2 digits only right after a year word ("tuổi 94", "năm sinh là 94", "tuổi của tôi là 94") or right before
+   *    "mạng / mệnh / con gì / tuổi gì" ("94 mạng gì"). "30 tuổi" alone is an age, not a year.
+   *    00..this year's two digits → 20xx only after "năm / sinh" or before "mạng / mệnh" (a toddler's year is
+   *    unlikely from "25 tuổi gì"); otherwise 19xx. */
+  var UNIT = /^(nghin|ngan|trieu|ty|k|dong|vnd|d|vien|cai|chiec|hat|soi|cuon|so|lan|phan|tram|met|cm|gram|g|kg)$/;
+  var FILL = '(?:(?:la|cua|toi|em|anh|chi|minh|con|thi|nha) )*';
+  var SHORT_A = new RegExp('(^| )(tuoi|nam|sinh|doi) ' + FILL + '([0-9]{2})( |$)');
+  var SHORT_B = /(^| )([0-9]{2}) (mang|menh|con gi|cung|tuoi gi|tuoi con)/;
   function yearOf(t) {
-    var m = t.match(/(^| )(19[2-9][0-9]|20[0-9][0-9])( |$)/), y = m ? parseInt(m[2], 10) : 0;
-    return y >= 1920 && y <= new Date().getFullYear() ? y : 0;
+    var now = new Date().getFullYear(), y = 0, d = -1, strong = false, m, i;
+    var w = t.replace(/(^| )(19|20) ([0-9]{2})(?= |$)/g, '$1$2$3').replace(/(^| )1 ([0-9]{3})(?= |$)/g, '$11$2').split(' ');
+    for (i = 0; i < w.length && !y; i++) {
+      if (!/^(19[2-9][0-9]|20[0-9][0-9])$/.test(w[i])) continue;
+      var prev = w[i - 1] || '', next = w[i + 1] || '';
+      if (/^[0-9]+$/.test(prev) || /^[0-9]+$/.test(next) || UNIT.test(next)) continue;   /* part of a price / phone / count */
+      y = parseInt(w[i], 10);
+    }
+    var s = w.join(' ');
+    if (!y && (m = s.match(SHORT_A))) { d = parseInt(m[3], 10); strong = m[2] === 'nam' || m[2] === 'sinh'; }
+    else if (!y && (m = s.match(SHORT_B))) { d = parseInt(m[2], 10); strong = m[3] === 'mang' || m[3] === 'menh'; }
+    if (d >= 0) y = d <= now % 100 ? (strong ? 2000 + d : 0) : 1900 + d;
+    return y >= 1920 && y <= now ? y : 0;
   }
 
   /* what the customer said (up to 5 guesses from the speech service, best first) → the tiger's answer */
