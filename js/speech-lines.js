@@ -168,23 +168,42 @@
   var ELEM_EN = ['Metal', 'Wood', 'Water', 'Fire', 'Earth'];
   var HOLY = ['1', '15', '4-15', '7-15'];
   var MOODS = ['Playful', 'Curious', 'Shy', 'Proud', 'Sleepy'];
+  /* V1.5.5: stones Phước Lộc carries for each element (from the Owner's product sheet, content-rules.json "stones":
+   * only stones whose listed elements include this one). Said as a belief ("theo quan niệm"), never a promise. */
+  var SHOP_STONES = {
+    'Kim': ['thạch anh vàng', 'thạch anh trắng', 'mắt hổ vàng nâu'],
+    'Mộc': ['thạch anh tóc xanh', 'mắt hổ xanh lá', 'đá peridot'],
+    'Thủy': ['thạch anh tóc đen', 'đá aquamarine', 'mắt hổ xanh dương'],
+    'Hỏa': ['thạch anh tóc đỏ', 'thạch anh tím', 'thạch anh hồng'],
+    'Thổ': ['thạch anh tóc vàng', 'mắt hổ vàng tâm', 'thạch anh tóc nâu']
+  };
+  var SHOP_STONES_EN = {
+    'Kim': ['citrine', 'clear quartz', 'golden-brown tiger eye'],
+    'Mộc': ['green rutilated quartz', 'green tiger eye', 'peridot'],
+    'Thủy': ['black rutilated quartz', 'aquamarine', 'blue tiger eye'],
+    'Hỏa': ['red rutilated quartz', 'amethyst', 'rose quartz'],
+    'Thổ': ['golden rutilated quartz', 'golden tiger eye', 'brown rutilated quartz']
+  };
 
   function low(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
   function li(lang) { return lang === 'en' ? 1 : 0; }
   function Q(lang) { return lang === 'en' ? FT.QUE_EN : FT.QUE; }
 
   FT.SPEECH = {
-    lines: L, ELEM: ELEM, HOLY: HOLY, MOODS: MOODS,
+    lines: L, ELEM: ELEM, HOLY: HOLY, MOODS: MOODS, SHOP_STONES: SHOP_STONES,
     /* text of line key/n in a language (bubble text, with emoji) */
     text: function (key, n, lang) {
       if (key === 'menh') return this.menhText(n, lang);
+      if (key === 'tuoi') return this.tuoiText(n, lang);
+      if (key === 'menhShop') return this.menhShopText(n, lang);
       if (key === 'que') return this.queText(n, lang);
       if (key === 'holy') return this.holyText(n, lang);
       var a = L[key]; if (!a || !a[n]) return '';
       return a[n][li(lang)];
     },
     count: function (key) {
-      if (key === 'menh') return ELEM.length;
+      if (key === 'menh' || key === 'menhShop') return ELEM.length;
+      if (key === 'tuoi') return 60;
       if (key === 'que') return FT.QUE.list.length;
       if (key === 'holy') return HOLY.length;
       return L[key] ? L[key].length : 0;
@@ -195,6 +214,24 @@
         ? 'In the Five Elements tradition, your element is ' + ELEM_EN[n] + '. Matching colours: ' + c + '.'
         : 'Theo quan niệm ngũ hành, anh/chị thuộc mệnh ' + m + '. Màu hợp mệnh: ' + c + '.';
     },
+    /* tuoi_<i>: i = place in the 60-year cycle (0 = Giáp Tý): tuổi, con giáp, nạp âm and its meaning */
+    tuoiText: function (i, lang) {
+      var t = FT.Lunar.tuoiAt(i);
+      return lang === 'en'
+        ? 'You were born in the year ' + t.canChi + ', the year of the ' + t.conEn + '. Your birth element is ' + t.nap + ', ' + t.meanEn +
+          ', of the ' + ELEM_EN[ELEM.indexOf(t.elem)] + ' element.'
+        : 'Anh/chị tuổi ' + t.canChi + ', tuổi con ' + t.con + ', mệnh ' + t.nap + ', nghĩa là ' + t.mean + ', thuộc hành ' + t.elem + '.';
+    },
+    /* menhShop_<n>: colours and the Phước Lộc stones for element n (not on holy days: that is selling) */
+    menhShopText: function (n, lang) {
+      var m = ELEM[n], c = Q(lang).colors[m];
+      if (lang === 'en') {
+        var e = SHOP_STONES_EN[m];
+        return 'In feng shui tradition, ' + ELEM_EN[n] + ' goes well with ' + c + '. At Phước Lộc you can look at ' + e[0] + ', ' + e[1] + ' and ' + e[2] + '.';
+      }
+      var v = SHOP_STONES[m];
+      return 'Theo quan niệm phong thủy, mệnh ' + m + ' hợp màu ' + c + '. Tại Phước Lộc, anh/chị có thể tham khảo ' + v[0] + ', ' + v[1] + ' và ' + v[2] + '.';
+    },
     queText: function (n, lang) {
       var q = Q(lang).list[n];
       return lang === 'en'
@@ -204,7 +241,7 @@
     holyText: function (n, lang) { return Q(lang).holy[HOLY[n]].wish; },
     /* every recorded clip: [id, lang, text] (id = key_n) */
     all: function () {
-      var out = [], keys = Object.keys(L).concat(['menh', 'que', 'holy']), self = this;
+      var out = [], keys = Object.keys(L).concat(['menh', 'tuoi', 'menhShop', 'que', 'holy']), self = this;
       ['vi', 'en'].forEach(function (lang) {
         keys.forEach(function (k) {
           for (var n = 0; n < self.count(k); n++) out.push([k + '_' + n, lang, self.text(k, n, lang)]);

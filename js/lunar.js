@@ -83,6 +83,33 @@
   var NAP = ['Kim', 'Hỏa', 'Mộc', 'Thổ', 'Kim', 'Hỏa', 'Thủy', 'Thổ', 'Kim', 'Mộc', 'Thủy', 'Thổ', 'Hỏa', 'Mộc', 'Thủy',
     'Kim', 'Hỏa', 'Mộc', 'Thổ', 'Kim', 'Hỏa', 'Thủy', 'Thổ', 'Kim', 'Mộc', 'Thủy', 'Thổ', 'Hỏa', 'Mộc', 'Thủy'];
   function menhOf(y) { return NAP[INT((((y - 4) % 60) + 60) % 60 / 2)]; }
+  /* V1.5.5: the full nạp âm name of each pair (Giáp Tý first), its plain meaning, and the zodiac animal (Vietnamese
+   * 12 con giáp: Mão = Mèo) — so the tiger can answer "1994 tuổi gì, mạng gì" right away. */
+  var NAP_NAME = ['Hải Trung Kim', 'Lư Trung Hỏa', 'Đại Lâm Mộc', 'Lộ Bàng Thổ', 'Kiếm Phong Kim', 'Sơn Đầu Hỏa',
+    'Giản Hạ Thủy', 'Thành Đầu Thổ', 'Bạch Lạp Kim', 'Dương Liễu Mộc', 'Tuyền Trung Thủy', 'Ốc Thượng Thổ',
+    'Tích Lịch Hỏa', 'Tùng Bách Mộc', 'Trường Lưu Thủy', 'Sa Trung Kim', 'Sơn Hạ Hỏa', 'Bình Địa Mộc',
+    'Bích Thượng Thổ', 'Kim Bạch Kim', 'Phú Đăng Hỏa', 'Thiên Hà Thủy', 'Đại Trạch Thổ', 'Thoa Xuyến Kim',
+    'Tang Đố Mộc', 'Đại Khê Thủy', 'Sa Trung Thổ', 'Thiên Thượng Hỏa', 'Thạch Lựu Mộc', 'Đại Hải Thủy'];
+  var NAP_MEAN = ['vàng trong biển', 'lửa trong lò', 'gỗ rừng lớn', 'đất ven đường', 'vàng mũi kiếm', 'lửa trên núi',
+    'nước dưới khe', 'đất trên thành', 'vàng chân đèn', 'gỗ cây dương liễu', 'nước trong suối', 'đất trên mái nhà',
+    'lửa sấm sét', 'gỗ cây tùng bách', 'nước chảy dài', 'vàng trong cát', 'lửa dưới chân núi', 'gỗ cây đồng bằng',
+    'đất trên vách', 'vàng pha bạch kim', 'lửa ngọn đèn', 'nước trên trời', 'đất đầm lớn', 'vàng trang sức',
+    'gỗ cây dâu', 'nước khe lớn', 'đất pha cát', 'lửa trên trời', 'gỗ cây thạch lựu', 'nước biển lớn'];
+  var NAP_MEAN_EN = ['gold in the sea', 'fire in the furnace', 'wood of the great forest', 'earth by the road',
+    'gold of the sword tip', 'fire on the mountain', 'water in the brook', 'earth of the city wall', 'gold of the candle',
+    'willow wood', 'water in the spring', 'earth on the roof', 'thunderbolt fire', 'pine and cypress wood',
+    'long flowing water', 'gold in the sand', 'fire at the foot of the mountain', 'wood of the plains', 'earth on the wall',
+    'white gold', 'lamp fire', 'water from the sky', 'earth of the great marsh', 'gold of jewellery', 'mulberry wood',
+    'water of the great stream', 'sandy earth', 'fire in the sky', 'pomegranate wood', 'water of the great sea'];
+  var CON = ['Chuột', 'Trâu', 'Hổ', 'Mèo', 'Rồng', 'Rắn', 'Ngựa', 'Dê', 'Khỉ', 'Gà', 'Chó', 'Heo'];
+  var CON_EN = ['Rat', 'Ox', 'Tiger', 'Cat', 'Dragon', 'Snake', 'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
+  /* everything about a (lunar) birth year: i = place in the 60-year cycle (0 = Giáp Tý) */
+  function tuoiOf(y) {
+    var i = (((y - 4) % 60) + 60) % 60, p = INT(i / 2), c = (((y + 8) % 12) + 12) % 12;
+    return { i: i, canChi: canChi(y), con: CON[c], conEn: CON_EN[c], nap: NAP_NAME[p], mean: NAP_MEAN[p], meanEn: NAP_MEAN_EN[p], elem: NAP[p] };
+  }
+  /* the same, from the place in the cycle (for the 60 recorded lines) */
+  function tuoiAt(i) { return tuoiOf(1984 + i); }
 
-  FT.Lunar = { solar2lunar: solar2lunar, canChi: canChi, menhOf: menhOf };
+  FT.Lunar = { solar2lunar: solar2lunar, canChi: canChi, menhOf: menhOf, tuoiOf: tuoiOf, tuoiAt: tuoiAt };
 })(typeof window !== 'undefined' ? window : globalThis);

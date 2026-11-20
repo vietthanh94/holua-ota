@@ -229,7 +229,7 @@
       menhName = String(nIn.value || '').replace(/[0-9<>&"]/g, '').replace(/\s+/g, ' ').trim().slice(0, 30);
       menhYear = y;
       closeMenh();
-      menhResult(FT.Lunar.menhOf(y));
+      menhResult(y);
     };
     Speech.say('menhAsk', 0, { prio: 1 });
   }
@@ -238,21 +238,28 @@
     p.className = ''; $('menhBody').innerHTML = '';
     var e = eng(); if (e && !(FT.que && FT.que.isOpen())) e.modal = false;
   }
-  function menhResult(m) {
-    var n = FT.SPEECH.ELEM.indexOf(m), l = lang();
+  /* V1.5.5: straight to the answer — tuổi (can chi, con giáp), mệnh nạp âm and its meaning, then the matching
+   * colours and the Phước Lộc stones (colours only on holy days: no selling), then the quẻ offer.
+   * The polite hello (with the typed name in the bubble) only comes first when a name was typed. */
+  function menhResult(y) {
+    var t = FT.Lunar.tuoiOf(y), n = FT.SPEECH.ELEM.indexOf(t.elem);
     if (n < 0) return;
     gesture(['hop', 'paw']);
-    var hello = menhName ? T('talk.helloName', { name: menhName }) : FT.SPEECH.text('menhHello', 0, l);
-    Speech.say('menhHello', 0, {
-      prio: 1, bubble: hello, then: function () {
-        Speech.say('menh', n, {
-          prio: 1, then: function () {
-            if (!holy()) ask(queOffer);                   /* Xin quẻ is closed on holy days */
-          }
-        });
-      }
-    });
-    diag('menh=' + n);
+    function answer() {
+      Speech.say('tuoi', t.i, {
+        prio: 1, then: function () {
+          Speech.say(holy() ? 'menh' : 'menhShop', n, {
+            prio: 1, then: function () {
+              if (!holy()) ask(queOffer);                 /* Xin quẻ is closed on holy days */
+            }
+          });
+        }
+      });
+    }
+    var hello = menhName ? T('talk.helloName', { name: menhName }) : '';     /* the name goes to the bubble only */
+    if (hello) Speech.say('menhHello', 0, { prio: 1, bubble: hello, then: answer });
+    else answer();
+    diag('menh=' + n + '&tuoi=' + t.i);
   }
   function queOffer() {
     Speech.say('menhAfter', 0, {
@@ -348,7 +355,7 @@
       if (!visit) newVisit();
       visit.menhAsked = true; visit.greeted = true;
       menhName = ''; menhYear = y; closeMenh(); hideChips(); pending = null;
-      menhResult(FT.Lunar.menhOf(y));
+      menhResult(y);
     },
     /* say one of the answer lines (key from speech-lines.js) */
     speak: function (key, opts) {
