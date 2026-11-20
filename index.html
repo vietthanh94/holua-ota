@@ -15,6 +15,7 @@
   <canvas id="sparks"></canvas>
   <header>
     <div class="brand"><img id="brandLogo" src="assets/brand/logo-phuoc-loc.png" alt="Logo Phước Lộc" data-i18n-alt="aria.logo"><span><strong>HỔ LỬA PHƯỚC LỘC</strong><em>Nâng Tầm Đẳng Cấp</em></span></div>
+    <button type="button" id="introBtn" aria-expanded="false" data-i18n="intro.btn">▶ Giới thiệu Phước Lộc</button>
     <button type="button" id="micBtn" style="display:none" aria-label="Nói với Hổ Lửa" data-i18n="mic.btn" data-i18n-aria="mic.aria">🎤 Nói</button>
     <button type="button" id="langBtn" aria-label="Switch to English">🌐 English</button>
     <button type="button" id="soundBtn" aria-label="Tắt âm thanh">🔊</button>
@@ -38,13 +39,20 @@
   <div id="menhPanel"><div class="qbox"><button type="button" id="menhClose" aria-label="Đóng" data-i18n-aria="aria.close">✕</button><div id="menhBody"></div></div></div>
   <div id="quePanel"><div class="qbox"><button type="button" id="queClose" aria-label="Đóng" data-i18n-aria="aria.close">✕</button><div id="queBody"></div></div></div>
 </main>
+<div id="introBox" role="dialog" aria-label="Giới thiệu Phước Lộc" data-i18n-aria="intro.title">
+  <div class="ibox">
+    <button type="button" id="introClose" aria-label="Đóng" data-i18n-aria="aria.close">✕</button>
+    <video id="introVideo" controls playsinline preload="none"></video>
+    <p id="introMsg"></p>
+  </div>
+</div>
 <div id="menuPanel" role="dialog" aria-label="Cài đặt" data-i18n-aria="menu.title">
   <div class="mhead"><strong data-i18n="menu.title">Cài đặt</strong><button type="button" id="menuClose" aria-label="Đóng" data-i18n-aria="aria.close">✕</button></div>
   <div class="mrow"><span class="mlab" data-i18n="menu.sound">Âm thanh</span>
     <div class="seg" id="menuSound"><button type="button" data-lvl="0" data-i18n="sound.0">Tắt</button><button type="button" data-lvl="1" data-i18n="sound.1">Nhẹ</button><button type="button" data-lvl="2" data-i18n="sound.2">Vừa</button></div></div>
   <div class="mrow"><span class="mlab" data-i18n="menu.ota">Cập nhật</span>
     <div class="mval"><span id="otaLine"></span><button type="button" id="otaNow" data-i18n="ota.now" style="display:none">Cập nhật ngay</button><small data-i18n="ota.auto">Máy tự kiểm tra khi mở và mỗi 3 giờ.</small></div></div>
-  <div class="mrow"><span class="mlab" data-i18n="menu.version">Phiên bản</span><span class="mval" id="version">V1.5.3</span></div>
+  <div class="mrow"><span class="mlab" data-i18n="menu.version">Phiên bản</span><span class="mval" id="version">V1.5.4</span></div>
 </div>
 <div id="slip"></div>
 <!-- load order matters: OTA boot check first (it counts script errors), utilities, engine last -->
@@ -70,5 +78,6 @@
 <script src="js/talk.js"></script>
 <script src="js/mic.js"></script>
 <script src="js/menu.js"></script>
+<script src="js/intro.js"></script>
 </body>
 </html>
