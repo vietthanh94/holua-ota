@@ -127,7 +127,7 @@
       '<p class="date">' + esc(solarText(t)) + '<br>' + esc(T('que.lunar')) + ': ' + esc(lunarText(t)) + '</p>' +
       '<p class="hint center">' + esc(T('que.askHint')) + '</p>' +
       '<label class="lbl" for="queName">' + esc(T('que.nameLbl')) + '</label>' +
-      '<div class="row"><input id="queName" type="text" maxlength="40" autocomplete="off" autocapitalize="words" placeholder="' + esc(T('que.namePh')) + '"></div>' +
+      '<div class="row"><input id="queName" type="text" maxlength="40" autocapitalize="words" spellcheck="false" placeholder="' + esc(T('que.namePh')) + '"></div>' +
       '<label class="lbl" for="queYear">' + esc(T('que.yearLbl')) + '</label>' +
       '<div class="row"><input id="queYear" type="number" inputmode="numeric" min="1920" max="' + maxY + '" placeholder="' + esc(T('que.yearPh')) + '"></div>' +
       '<p class="hint" id="queMenh">' + esc(T('que.need')) + '</p>' +

@@ -1,0 +1,12 @@
+{
+ "type": "video/mp4",
+ "bytes": 7377175,
+ "sha256": "ec673c50c005a4dfcc483288791e08d34e3dbe21bdf2c26c94aba6058deba796",
+ "parts": [
+  "intro.0.txt",
+  "intro.1.txt"
+ ],
+ "w": 720,
+ "h": 720,
+ "seconds": 61.4
+}
